@@ -29,11 +29,13 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     if args.mode =='run':
+        with open(args.input) as f:
+            text = f.read().strip()
         if args.puzzle == 1:
-            print (puzzle1(args.input))
+            print (puzzle1(text))
             
         elif args.puzzle==2:
-            print (puzzle2(args.input))
+            print (puzzle2(text))
     else:
         unittest.main()
 

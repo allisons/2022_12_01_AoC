@@ -5,12 +5,25 @@ class Test(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls):
-        cls.test1input = "12_01_test1.txt"
-        cls.inventory = parse_input("12_01_test1.txt")
+        cls.rawtext = """1000
+2000
+3000
+
+4000
+
+5000
+6000
+
+7000
+8000
+9000
+
+10000"""
+        cls.inventory = parse_input(cls.rawtext)
     
     def test_parse(self):
         expected = [[1000,2000,3000],[4000],[5000,6000],[7000,8000,9000],[10000]]
-        actual = parse_input(self.test1input)
+        actual = parse_input(self.rawtext)
         self.assertTrue(expected,actual),actual
     
     def test_most_calories(self):
@@ -26,18 +39,16 @@ class Test(unittest.TestCase):
     #end to end puzzle 1
     def test_puzzle_1(self):
         expected = 24000
-        actual = puzzle1(self.test1input)
+        actual = puzzle1(self.rawtext)
 
     #end to end test puzzle 2
     def test_puzzle_2(self):
         expected = 45000
-        actual = puzzle2(self.test1input)
+        actual = puzzle2(self.rawtext)
 
    
     
-def parse_input(path):
-    with open(path) as f:
-        text = f.read().strip()
+def parse_input(text):
     return [[int(num) for num in line.split("\n")] for line in text.split('\n\n')]
    
 def summarized_inventory(inventory):
@@ -52,11 +63,11 @@ def top_n_calories(inventory,n):
     return top_n
     
 
-def puzzle1(path):
-    return max(summarized_inventory(parse_input(path)))
+def puzzle1(text):
+    return max(summarized_inventory(parse_input(text)))
 
-def puzzle2(path):
-    return sum(top_n_calories(summarized_inventory(parse_input(path)),3))
+def puzzle2(text):
+    return sum(top_n_calories(summarized_inventory(parse_input(text)),3))
     
     
 
@@ -71,11 +82,13 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     if args.mode =='run':
+        with open(args.input) as f:
+            text = f.read().strip()
         if args.puzzle == 1:
-            print (puzzle1(args.input))
+            print (puzzle1(text))
             
         elif args.puzzle==2:
-            print (puzzle2(args.input))
+            print (puzzle2(text))
     else:
         unittest.main()
         
