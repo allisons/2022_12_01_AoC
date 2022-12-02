@@ -3,18 +3,25 @@ import unittest
 
 class Test(unittest.TestCase):
     
+    @classmethod
+    def setUpClass(cls):
+        cls.testinput = """"""
+        
+    def test_parse_input(self):
+        pass       
+    
     def test_puzzle1:
         pass
     def test_puzzle2:
         pass
 
-def parse_input(path):
+def parse_input(text):
     return "Not Yet Implemented"
     
-def puzzle1(path):
+def puzzle1(text):
     return "Not yet Implemented"
 
-def puzzle2(path):
+def puzzle2(text):
     return "Not Yet Implemented"
 
 
