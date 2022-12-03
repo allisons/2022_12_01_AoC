@@ -10,9 +10,9 @@ class Test(unittest.TestCase):
     def test_parse_input(self):
         pass       
     
-    def test_puzzle1(self):
+    def test_puzzle1:
         pass
-    def test_puzzle2(self):
+    def test_puzzle2:
         pass
 
 def parse_input(text):
