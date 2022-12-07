@@ -4,6 +4,7 @@ import numpy as np
 import re
 from collections import defaultdict
 from functools import partial
+from heapq import nsmallest 
 
 class Test(unittest.TestCase):
     
@@ -21,6 +22,34 @@ dir e
 29116 f
 2557 g
 62596 h.lst
+$ cd e
+$ ls
+584 i
+$ cd ..
+$ cd ..
+$ cd d
+$ ls
+4060174 j
+8033020 d.log
+5626152 d.ext
+7214296 k"""
+        
+        cls.testinput2 = """$ cd /
+$ ls
+dir a
+14848514 b.txt
+8504156 c.dat
+dir d
+$ cd a
+$ ls
+dir a
+dir e
+29116 f
+2557 g
+62596 h.lst
+$ cd a
+1000 fake.txt
+$ cd ..
 $ cd e
 $ ls
 584 i
@@ -102,16 +131,32 @@ dir d""",pointer.parent.__str__())
         
     def test_little_children(self):
         tree = build_tree(parse_input(self.testinput))
-        little_children = tree.little_children({})
+        little_children = tree.little_children(tree.name,{})
+        self.assertEqual(sum(little_children.values()),95437)
+
+    def test_little_children(self):
+        tree = build_tree(parse_input(self.testinput))
+        little_children = tree.little_children(tree.name,{})
         self.assertEqual(sum(little_children.values()),95437)
         
+    def test_big_children(self):
+        tree = build_tree(parse_input(self.testinput))
+        expected = {'/': 48381165, '/d': 24933642}
+        big_children = tree.big_children(8381165,tree.name,{"/":tree.calculate_size()})
+        self.assertEqual(expected,big_children)
     
     def test_puzzle1(self):
         tree = build_tree(parse_input(self.testinput))
-        self.assertEqual(sum(tree.little_children({}).values()),95437)
-
+        self.assertEqual(sum(tree.little_children(tree.name,{}).values()),95437)
+    def test_nested_a(self):
+        tree = build_tree(parse_input(self.testinput2))
+        self.assertEqual(tree.calculate_size(),48382165)
+        self.assertEqual(tree.get_child("a").get_child("a").calculate_size(),1000)
+        
+        
     def test_puzzle2(self):
-        pass
+        self.assertEqual(puzzle2(self.testinput),24933642)
+        
 
 class NodeTree(object):
     
@@ -125,10 +170,12 @@ class NodeTree(object):
         return self.children[child_name]
     
     def add_node_child(self,child_name,parent):
+        assert child_name not in self.children.keys()
         self.isTerminal = False
         self.children[child_name] = NodeTree(child_name,parent=parent)
     
     def add_leaf_child(self,child_name,size,parent):
+        assert child_name not in self.children.keys()
         self.children[child_name] = NodeLeaf(child_name,size,parent)
 
     def get_parent(self):
@@ -146,14 +193,24 @@ class NodeTree(object):
                     size+=child.calculate_size()
         return size
     
-    def little_children(self,sizemap):
+    def little_children(self,root,sizemap):
         for child in self.children.values():
             mysize = child.calculate_size()
             if isinstance(child,NodeLeaf):
                 continue
             elif mysize <= 100000:
-                sizemap[child.name] = mysize
-            child.little_children(sizemap)
+                sizemap[root+child.name] = mysize
+            child.little_children(root+child.name+"/",sizemap)
+        return sizemap
+    
+    def big_children(self,need_space,root,sizemap):
+        for child in self.children.values():
+            mysize = child.calculate_size()
+            if isinstance(child,NodeLeaf):
+                continue
+            elif mysize >= need_space:
+                sizemap[root+child.name] = mysize
+            child.big_children(need_space,root+child.name+"/",sizemap)
         return sizemap
             
 
@@ -201,10 +258,15 @@ def build_tree(lines):
     
 def puzzle1(text):
     tree = build_tree(parse_input(text))    
-    return sum(tree.little_children({}).values())
+    return sum(tree.little_children("/",{}).values())
 
 def puzzle2(text):
-    return "Not Yet Implemented"
+    tree = build_tree(parse_input(text))
+    free_space = 70000000- tree.calculate_size()
+    need_space = 30000000-free_space
+    big_children = tree.big_children(need_space,"/",{"/":tree.calculate_size()})
+    return [val for _, val in nsmallest(1, big_children.items(), key = lambda ele: ele[1])][0]
+    
 
 
 if __name__ == "__main__":
