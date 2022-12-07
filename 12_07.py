@@ -109,7 +109,7 @@ dir d""",pointer.parent.__str__())
     def test_puzzle1(self):
         tree = build_tree(parse_input(self.testinput))
         self.assertEqual(sum(tree.little_children({}).values()),95437)
-        pass
+
     def test_puzzle2(self):
         pass
 
